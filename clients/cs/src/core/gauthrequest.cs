@@ -21,6 +21,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Collections;
+using System.ComponentModel;
 
 #endregion
 
@@ -300,9 +301,10 @@ namespace Google.GData.Client
         private MemoryStream requestCopy;
         /// <summary>holds the factory instance</summary> 
         private GDataGAuthRequestFactory factory; 
-
+        private AsyncData asyncData;
+       summary> 
         //////////////////////////////////////////////////////////////////////
-        /// <summary>default constructor</summary> 
+/// <summary>default constructor</summary> 
         //////////////////////////////////////////////////////////////////////
         internal GDataGAuthRequest(GDataRequestType type, Uri uriTarget, GDataGAuthRequestFactory factory)  : base(type, uriTarget, factory as GDataRequestFactory)
         {
@@ -333,9 +335,17 @@ namespace Google.GData.Client
        /////////////////////////////////////////////////////////////////////////////
        
 
-        
+       internal AsyncData AsyncData
+       {
+           set 
+           {
+               this.asyncData = value;
+           }
+       }
+
+       summary> 
         //////////////////////////////////////////////////////////////////////
-        /// <summary>does the real disposition</summary> 
+/// <summary>does the real disposition</summary> 
         /// <param name="disposing">indicates if dispose called it or finalize</param>
         //////////////////////////////////////////////////////////////////////
         protected override void Dispose(bool disposing)
@@ -713,21 +723,38 @@ namespace Google.GData.Client
                 Stream req = base.GetRequestStream();
 
                 const int size = 4096;
-                byte[] bytes = new byte[4096];
+                byte[] bytes = nsize];
                 int numBytes;
 
-                this.requestCopy.Seek(0, SeekOrigin.Begin); 
+                double oneLoop = 100;
+                if (requestCopy.Length > size)
+                {
+                    oneLoop = (100 / ((double) this.requestCopy.Length / size));
+
+                }
+                double current = 0; 
+
+                this.requestCopy.Seek(0, SeekOrigin.Begin);
+
+                long bytesWritten = 0n.Begin); 
 
                 while((numBytes = this.requestCopy.Read(bytes, 0, size)) > 0)
                 {
                     req.Write(bytes, 0, numBytes);
+            bytesWritten += numBytes; 
+                    if (this.asyncData != null && this.asyncData.Delegate != null)
+                    {
+                        AsyncOperationProgressEventArgs args;
+                        args = new AsyncOperationProgressEventArgs(this.requestCopy.Length, bytesWritten, (int)current, this.asyncData.UserData);
+                        this.asyncData.Operation.Post(this.asyncData.Delegate, args);
+                        current += oneLoop;
+                    }
                 }
                 req.Close();
             }
         }
         /////////////////////////////////////////////////////////////////////////////
-
     }
-    /////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////
 } 
 ///////////////////////////////////////////////////////////////////////
