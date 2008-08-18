@@ -732,15 +732,20 @@ namespace Google.GData.Client
                     oneLoop = (100 / ((double) this.requestCopy.Length / size));
 
                 }
-                double current = 0; 
 
                 this.requestCopy.Seek(0, SeekOrigin.Begin);
 
-                long bytesWritten = 0n.Begin); 
-
-                while((numBytes = this.requestCopy.Read(bytes, 0, size)) > 0)
+#if WindowsCE || PocketPC
+#else
+                long bytesWritten = 0; 
+                double current = 0; 
+#endif
+                while    while((numBytes = this.requestCopy.Read(bytes, 0, size)) > 0)
                 {
                     req.Write(bytes, 0, numBytes);
+            
+#if WindowsCE || PocketPC
+#elsemBytes);
             bytesWritten += numBytes; 
                     if (this.asyncData != null && this.asyncData.Delegate != null)
                     {
@@ -749,6 +754,7 @@ namespace Google.GData.Client
                         this.asyncData.Operation.Post(this.asyncData.Delegate, args);
                         current += oneLoop;
                     }
+#endif
                 }
                 req.Close();
             }
