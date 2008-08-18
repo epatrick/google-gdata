@@ -671,7 +671,13 @@ namespace Google.GData.Client
                             throw re; 
                         }
                     }
+                
+                // verify that there is a non empty location string
+                if (re.Location.Trim().Length == 0)
+                {
+                    throw;
                 }
+  }
              se.Reset();
                 this.TargetUri = new Uri(re.Location);
                 CopyRequestData();
