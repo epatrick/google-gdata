@@ -728,45 +728,54 @@ namespace Google.GData.Client
                 // stream it into the real request stream
                 Stream req = base.GetRequestStream();
 
-                const int size = 4096;
-                byte[] bytes = nsize];
-                int numBytes;
-
-                double oneLoop = 100;
-                if (requestCopy.Length > size)
+        try
                 {
-                    oneLoop = (100 / ((double) this.requestCopy.Length / size));
+                    const int size = 4096;
+                    byte[] bytes = new byte[size];
+                    int numBytes;
 
-                }
+                    double oneLoop = 100;
+                    if (requestCopy.Length > size)
+                    {
+                        oneLoop = (100 / ((double)this.requestCopy.Length / size));
 
-                this.requestCopy.Seek(0, SeekOrigin.Begin);
+                    }
+
+                    this.requestCopy.Seek(0, SeekOrigin.Begin);
 
 #if WindowsCE || PocketPC
 #else
-                long bytesWritten = 0; 
-                double current = 0; 
+                    long bytesWritten = 0;
+                    double current = 0;
 #endif
-                while    while((numBytes = this.requestCopy.Read(bytes, 0, size)) > 0)
-                {
-                    req.Write(bytes, 0, numBytes);
-            
-#if WindowsCE || PocketPC
-#elsemBytes);
-            bytesWritten += numBytes; 
-                    if (this.asyncData != null && this.asyncData.Delegate != null)
+                    while ((numBytes = this.requestCopy.Read(bytes, 0, size)) > 0)
                     {
-                        AsyncOperationProgressEventArgs args;
-                        args = new AsyncOperationProgressEventArgs(this.requestCopy.Length, bytesWritten, (int)current, this.asyncData.UserData);
-                        this.asyncData.Operation.Post(this.asyncData.Delegate, args);
-                        current += oneLoop;
-                    }
+                        req.Write(bytes, 0, numBytes);
+
+#if WindowsCE || PocketPC
+#else
+                        bytesWritten += numBytes;
+                        if (this.asyncData != null && this.asyncData.Delegate != null &&
+                            this.asyncData.Service != null)
+                        {
+                            AsyncOperationProgressEventArgs args;
+                            args = new AsyncOperationProgressEventArgs(this.requestCopy.Length, bytesWritten, (int)current, this.asyncData.UserData);
+
+                            if (this.asyncData.Service.SendProgressData(asyncData, args) == false)
+                                break;
+                            current += oneLoop;
+                        }
 #endif
+                    }
                 }
-                req.Close();
+                finally
+                {
+                    req.Close();
+                }
             }
         }
         /////////////////////////////////////////////////////////////////////////////
     }
-    /////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 } 
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
