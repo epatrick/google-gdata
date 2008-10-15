@@ -12,6 +12,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+/* Change history
+* Oct 13 2008  Joe Feser       joseph.feser@gmail.com
+* Removed warnings
+* 
+*/
 #region Using directives
 
 #define USE_TRACING
@@ -718,7 +723,7 @@ namespace Google.GData.Client
                     this.responseVersion = new VersionInformation(response.Headers[GDataGAuthRequestFactory.GDataVersion]);
                 }
             }
-            catch (GDataForbiddenException re) 
+            catch (GDataForbiddenException) 
             {
                 Tracing.TraceMsg("need to reauthenticate, got a forbidden back");
                 // do it again, once, reset AuthToken first and streams first
@@ -757,7 +762,7 @@ namespace Google.GData.Client
                 CopyRequestData();
                 base.Execute();
             }
-            catch (GDataRequestException re)
+            catch (GDataRequestExcept re)
             {
                 iretryCountering > this.factory.NumberOfRetries)
                 {
