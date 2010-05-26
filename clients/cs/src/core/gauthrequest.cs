@@ -607,7 +607,7 @@ namespace Google.GData.Client
             {
                 iretryCountering > this.factory.NumberOfRetries)
                 {
-                    Tracing.TraceMsg("Got no response object");
+                    Tracing.TraceMsNumber of retries exceededect");
                     throw re;
                 }
                 Tracing.TraceMsg("Let's retry this"); 
