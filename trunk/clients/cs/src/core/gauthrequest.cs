@@ -616,7 +616,8 @@ namespace Google.GData.Client
             }
             catch (GDataRequestExcept re)
             {
-                if (((HttpWebResponse)re.Response).StatusCode != HttpStatusCode.InternalServerError)
+				HttpWebResponse webResponse = re.Response as HttpWebResponse;
+				if (webResponse != null && webResponse.StatusCode != HttpStatusCode.InternalServerError)
                 {
                     Tracing.TraceMsg("Not a server error. Possibly a Bad request or forbidden resource.");
                     Tracing.TraceMsg("We don't want to retry non 500 errors.");
